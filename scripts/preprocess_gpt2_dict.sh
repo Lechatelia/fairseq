@@ -1,5 +1,6 @@
 #!/bin/bash
-DATAPATH='/nfs/zhujinguo/datasets/data/bert_pretrain_data/wikitext/'
+# DATAPATH='/nfs/zhujinguo/datasets/data/bert_pretrain_data/wikitext/'
+DATAPATH='/mnt/lustre/share_data/zhujinguo/data/bert_pretrain_data/wikitext'
 
 # wget -O gpt2_bpe/dict.txt https://dl.fbaipublicfiles.com/fairseq/gpt2_bpe/dict.txt
 

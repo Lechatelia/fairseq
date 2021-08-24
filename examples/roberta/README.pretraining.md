@@ -12,6 +12,11 @@ this dataset is quite small, so the resulting pretrained model will perform
 poorly, but it gives the general idea.
 
 First download the dataset:
+maybe somewhere
+```
+cd /mnt/lustre/share_data/zhujinguo/data/bert_pretrain_data/wikitext
+```
+
 ```bash
 wget https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-raw-v1.zip
 unzip wikitext-103-raw-v1.zip

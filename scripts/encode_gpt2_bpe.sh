@@ -1,6 +1,7 @@
 #!/bin/bash
 
-DATAPATH='/nfs/zhujinguo/datasets/data/bert_pretrain_data/wikitext/'
+# DATAPATH='/nfs/zhujinguo/datasets/data/bert_pretrain_data/wikitext/'
+DATAPATH='/mnt/lustre/share_data/zhujinguo/data/bert_pretrain_data/wikitext'
 
 # mkdir -p gpt2_bpe
 # wget -O gpt2_bpe/encoder.json https://dl.fbaipublicfiles.com/fairseq/gpt2_bpe/encoder.json

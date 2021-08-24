@@ -139,3 +139,5 @@ multirun/
 outputs/
 .vscode/
 gpt2_bpe/
+arun_log/
+workdirs/
