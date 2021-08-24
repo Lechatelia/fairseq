@@ -1,5 +1,20 @@
 #!/bin/bash
 
+if [[ $# -ge 1 ]]; then
+  JOB_NAME=${1}
+else
+  JOB_NAME=debug
+fi
+
+filename=$(basename "$0")
+echo "$filename"
+WORK_DIR=${filename//.sh//$JOB_NAME}
+WORK_DIR=workdirs/$WORK_DIR
+mkdir  -p $WORK_DIR
+
+DATA_DIR=/nfs/zhujinguo/datasets/data/bert_pretrain_data/wikitext/wikitext-103-raw/data-bin/wikitext-103
+
+now=$(date +"%Y%m%d_%H%M%S")
 
 TOTAL_UPDATES=125000    # Total number of training steps
 WARMUP_UPDATES=10000    # Warmup the learning rate over this many updates
@@ -10,8 +25,6 @@ MAX_SENTENCES=16        # Number of sequences per batch (batch size)
 UPDATE_FREQ=16          # Increase the batch size 16x
 
 
-DATA_DIR=/nfs/zhujinguo/datasets/data/bert_pretrain_data/wikitext/wikitext-103-raw/data-bin/wikitext-103
-
 python ./train.py --fp16 $DATA_DIR \
     --task masked_lm --criterion masked_lm \
     --arch roberta_base --sample-break-mode complete --tokens-per-sample $TOKENS_PER_SAMPLE \
@@ -19,4 +32,5 @@ python ./train.py --fp16 $DATA_DIR \
     --lr-scheduler polynomial_decay --lr $PEAK_LR --warmup-updates $WARMUP_UPDATES --total-num-update $TOTAL_UPDATES \
     --dropout 0.1 --attention-dropout 0.1 --weight-decay 0.01 \
     --batch-size $MAX_SENTENCES --update-freq $UPDATE_FREQ \
-    --max-update $TOTAL_UPDATES --log-format simple --log-interval 1
+    --max-update $TOTAL_UPDATES --log-format simple --log-interval 1 --save-dir $WORK_DIR/checkpoints \
+    2>&1 | tee -a $WORK_DIR/exp_$now.txt 
