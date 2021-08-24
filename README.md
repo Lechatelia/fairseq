@@ -8,6 +8,7 @@ pip install -U omegaconf==2.0.6 hydra-core==1.0.6
 
 please refer to 
 * [roberta pretrain](examples/roberta/README.pretraining.md)
+* [roberta finetune](examples/roberta/README.glue.md)
 
 <p align="center">
   <img src="docs/fairseq_logo.png" width="150">
