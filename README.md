@@ -10,6 +10,22 @@ please refer to
 * [roberta pretrain](examples/roberta/README.pretraining.md)
 * [roberta finetune](examples/roberta/README.glue.md)
 
+## wikipedia bookcorpus data pretrain
+
+```
+mkdir bookswiki 
+cat bc1g.doc wiki.doc > bookswiki/bookswiki.doc
+```
+```
+sh scripts/encode_gpt2_bpe_bookswiki.sh
+sh scripts/preprocess_gpt2_dict_bookswiki.sh
+```
+
+制作训练集和valid data
+ cat bookswiki-1000.doc| wc -l  
+
+
+
 <p align="center">
   <img src="docs/fairseq_logo.png" width="150">
   <br />
