@@ -1,0 +1,10 @@
+#!/bin/bash
+
+GLUE_DATA_FOLDER=$1
+
+TASKS="QQP MNLI QNLI MRPC RTE STS-B SST-2 CoLA"
+
+for TASK in $TASKS
+do
+ mv $TASK-bin $GLUE_DATA_FOLDER
+done

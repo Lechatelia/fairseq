@@ -141,3 +141,8 @@ outputs/
 gpt2_bpe/
 arun_log/
 workdirs/
+dict.txt
+encoder.json
+vocab.bpe
+core.*
+pretrained_checkpoints/*

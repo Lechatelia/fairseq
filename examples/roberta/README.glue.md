@@ -1,8 +1,15 @@
 # Finetuning RoBERTa on GLUE tasks
 
 ### 1) Download the data from GLUE website (https://gluebenchmark.com/tasks) using following commands:
+download shell 
+```wget https://gist.githubusercontent.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e/raw/1502038877f6a88c225a34450793fbc3ea87eaba/download_glue_data.py```
+already in the `scripts/download_glue_data.py`
+sometimes this script is out of date, you should get the newer version of this
+
 ```bash
-wget https://gist.githubusercontent.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e/raw/17b8dd0d724281ed7c3b2aeeda662b92809aadd5/download_glue_data.py
+
+# wget https://gist.githubusercontent.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e/raw/17b8dd0d724281ed7c3b2aeeda662b92809aadd5/download_glue_data.py
+
 python download_glue_data.py --data_dir glue_data --tasks all
 ```
 
@@ -10,9 +17,17 @@ python download_glue_data.py --data_dir glue_data --tasks all
 ```bash
 ./examples/roberta/preprocess_GLUE_tasks.sh glue_data <glue_task_name>
 ```
+```
+sh examples/roberta/preprocess_GLUE_tasks.sh /nfs/zhujinguo/datasets/data/bert_pretrain_data/glue_data ALL
+```
 `glue_task_name` is one of the following:
 `{ALL, QQP, MNLI, QNLI, MRPC, RTE, STS-B, SST-2, CoLA}`
 Use `ALL` for preprocessing all the glue tasks.
+
+move to the glue datapath
+```
+sh examples/roberta/mv_glue_data.sh /nfs/zhujinguo/datasets/data/bert_pretrain_data/glue_data
+```
 
 ### 3) Fine-tuning on GLUE task:
 Example fine-tuning cmd for `RTE` task
