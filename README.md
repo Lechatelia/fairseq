@@ -11,18 +11,29 @@ please refer to
 * [roberta finetune](examples/roberta/README.glue.md)
 
 ## wikipedia bookcorpus data pretrain
+cd your data path 
+
+```
+cd /nfs/zhujinguo/datasets/data/bert_pretrain_data/
+```
 
 ```
 mkdir bookswiki 
-cat bc1g.doc wiki.doc > bookswiki/bookswiki.doc
+mv bc1g.doc wiki.doc ./bookswiki
+cd bookswiki
+cat bc1g.doc wiki.doc > bookswiki.doc
+cat bookswiki.doc| wc -l 
+ # for valid and test dataset 
+head -n 1000 bookswiki.doc >  bookswiki-1000.doc
+cat bookswiki-1000.doc| wc -l  
 ```
 ```
 sh scripts/encode_gpt2_bpe_bookswiki.sh
 sh scripts/preprocess_gpt2_dict_bookswiki.sh
 ```
+```
 
-制作训练集和valid data
- cat bookswiki-1000.doc| wc -l  
+```
 
 
 

@@ -40,7 +40,7 @@ WARMUP_UPDATES=('7432'	'1986'	'28318'	'122'	'1256'	'137'	'320'	'214')
 
 MAX_SENTENCES=16        # Batch size.
 ROBERTA_PATH=pretrained_checkpoints/roberta.large/model.pt
-DATA_DIR=/nfs/zhujinguo/datasets/data/bert_pretrain_data/glue_data
+DATA_DIR=/mnt/lustre/share_data/zhujinguo/data/bert_pretrain_data/glue_data
 
 set -x
 
@@ -68,9 +68,9 @@ for task_index in "${!TASKS[@]}"
       fi
   done
 
-{ spring.submit arun --mpi=None  --job-name=${JOB_NAME} -n$GPUS --gpu   \
+{ spring.submit arun --mpi=None  --job-name=${TASK}-${JOB_NAME} -n$GPUS --gpu   \
 --gres=gpu:${GPUS_PER_NODE}  --ntasks-per-node=${GPUS_PER_NODE} \
---cpus-per-task $CPUS_PER_TASK 
+--cpus-per-task $CPUS_PER_TASK \
 " python ./train.py ${DATA_DIR}/${TASK}-bin/ \
       --restore-file $ROBERTA_PATH \
       --max-positions 512 \
