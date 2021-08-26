@@ -64,13 +64,15 @@ def slurm_environ_init():
     os.environ['RANK'] = str(proc_id)
     os.environ['LOCAL_RANK'] = str(proc_id % num_gpus)
     os.environ['LOCAL_SIZE'] = str(num_gpus)
+    print('world size: {} rank: {}'.format(str(ntasks, str(proc_id))))
 
 def infer_init_method(cfg: DistributedTrainingConfig, force_distributed=False):
+    slurm_environ_init()
+    
     if cfg.distributed_init_method is not None or cfg.tpu:
         return
     
-    slurm_environ_init()
-    
+
     num_pipelines_per_node = None
     if cfg.pipeline_model_parallel:
         num_pipeline_devices, num_pipelines_per_node = _pipeline_parallel_pre_init(cfg)
