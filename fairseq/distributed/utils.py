@@ -67,7 +67,7 @@ def slurm_environ_init():
     logger.info('world size: {} rank: {} addr: {} port: {}'.format(str(ntasks), str(proc_id), addr, os.environ.get('MASTER_PORT')))
 
 def infer_init_method(cfg: DistributedTrainingConfig, force_distributed=False):
-    slurm_environ_init()
+    # slurm_environ_init()
     
     if cfg.distributed_init_method is not None or cfg.tpu:
         return
