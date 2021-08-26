@@ -4,8 +4,8 @@
 JOB_NAME=${1:-debug}
 
 TASK_ARGS=${2:-"ALL"}
-
-PY_ARGS=${@:3}
+SRUN=${3:-"srun"}
+PY_ARGS=${@:4}
 
 GPUS=1
 GPUS_PER_NODE=${GPUS:-8}
@@ -65,11 +65,12 @@ for task_index in "${!TASKS[@]}"
             break;
         fi
     done
-    export MASTER_PORT=${PORT}
+    # export MASTER_PORT=${PORT}
 
-{ 
+set -x 
+
 a=$(echo $HOSTNAME | cut  -c12-16)
-if [ $a == '198-6' ]; then
+if [ $a == '198-6' -o "${SRUN}" == "spring" ]; then
     spring.submit arun --mpi=None  --job-name=${TASK}-${JOB_NAME} -n$GPUS --gpu   \
     --gres=gpu:${GPUS_PER_NODE}  --ntasks-per-node=${GPUS_PER_NODE} \
     --cpus-per-task $CPUS_PER_TASK \
@@ -86,15 +87,15 @@ if [ $a == '198-6' ]; then
       --criterion sentence_prediction \
       --num-classes ${NUM_CLASSES[$task_index]} \
       --dropout 0.1 --attention-dropout 0.1 \
-      --weight-decay 0.1 --optimizer adam --adam-betas \"(0.9, 0.98)\" --adam-eps 1e-06 \
+      --weight-decay 0.1 --optimizer adam --adam-betas '(0.9, 0.98)' --adam-eps 1e-06 \
       --clip-norm 0.0 \
       --lr-scheduler polynomial_decay --lr ${LRS[$task_index]} \
-       --total-num-update ${TOTAL_NUM_UPDATES[$task_index]} \
+      --total-num-update ${TOTAL_NUM_UPDATES[$task_index]} \
       --warmup-updates ${WARMUP_UPDATES[$task_index]} \
       --fp16 --fp16-init-scale 4 --threshold-loss-scale 1 --fp16-scale-window 128 \
       --max-epoch 10 --find-unused-parameters --save-dir $WORK_DIR/$TASK/checkpoints \
-      $checkpointmetric  $PY_ARGS \
-    2>&1 | tee -a $WORK_DIR/$TASK/exp_$now.txt "
+      $checkpointmetric  --distributed-port ${PORT} --distributed-world-size $GPUS $PY_ARGS \
+      2>&1 | tee -a $WORK_DIR/$TASK/exp_$now.txt "
 elif [ $a == '198-8' ]; then
     srun --partition=vc_research_2 --mpi=pmi2 \
   --job-name=${TASK}-${JOB_NAME} -n$GPUS \
@@ -113,19 +114,20 @@ elif [ $a == '198-8' ]; then
       --criterion sentence_prediction \
       --num-classes ${NUM_CLASSES[$task_index]} \
       --dropout 0.1 --attention-dropout 0.1 \
-      --weight-decay 0.1 --optimizer adam --adam-betas "(0.9, 0.98)" --adam-eps 1e-06 \
+      --weight-decay 0.1 --optimizer adam --adam-betas '(0.9, 0.98)' --adam-eps 1e-06 \
       --clip-norm 0.0 \
       --lr-scheduler polynomial_decay --lr ${LRS[$task_index]} \
        --total-num-update ${TOTAL_NUM_UPDATES[$task_index]} \
       --warmup-updates ${WARMUP_UPDATES[$task_index]} \
       --fp16 --fp16-init-scale 4 --threshold-loss-scale 1 --fp16-scale-window 128 \
       --max-epoch 10 --find-unused-parameters --save-dir $WORK_DIR/$TASK/checkpoints \
-      $checkpointmetric  $PY_ARGS \
+      $checkpointmetric  \
+      --distributed-port ${PORT} --distributed-world-size $GPUS $PY_ARGS \
     2>&1 | tee -a $WORK_DIR/$TASK/exp_$now.txt 
 else
   echo only SH1986 and SH1988 supported now 
 fi
-} &
+
 
 sleep 10
     
