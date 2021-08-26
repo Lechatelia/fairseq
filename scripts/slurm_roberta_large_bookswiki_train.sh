@@ -47,7 +47,7 @@ do
         break;
     fi
 done
-# export MASTER_PORT=${PORT}
+export MASTER_PORT=${PORT}
 
 a=$(echo $HOSTNAME | cut  -c12-16)
 if [ $a == '198-6' ]; then
@@ -78,7 +78,7 @@ srun --partition=vc_research_2 --mpi=pmi2 \
     --dropout 0.1 --attention-dropout 0.1 --weight-decay 0.01 \
     --batch-size $MAX_SENTENCES --update-freq $UPDATE_FREQ \
     --max-update $TOTAL_UPDATES --log-format simple --log-interval 1 --save-dir $WORK_DIR/checkpoints \
-     --distributed_port ${PORT} --distributed_world_size $GPUS $PY_ARGS \
+     $PY_ARGS \
     2>&1 | tee -a $WORK_DIR/exp_$now.txt 
 else
   echo only SH1986 and SH1988 supported now 
