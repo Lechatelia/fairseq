@@ -28,6 +28,7 @@ import io
 TASKS = ["CoLA", "SST", "MRPC", "QQP", "STS", "MNLI", "QNLI", "RTE", "WNLI", "diagnostic"]
 TASK2PATH = {"CoLA":'https://dl.fbaipublicfiles.com/glue/data/CoLA.zip',
              "SST":'https://dl.fbaipublicfiles.com/glue/data/SST-2.zip',
+             "MRPC": 'https://firebasestorage.googleapis.com/v0/b/mtl-sentence-representations.appspot.com/o/data%2Fmrpc_dev_ids.tsv?alt=media&token=ec5c0836-31d5-48f4-b431-7480817f1adc',
              "QQP":'https://dl.fbaipublicfiles.com/glue/data/STS-B.zip',
              "STS":'https://dl.fbaipublicfiles.com/glue/data/QQP-clean.zip',
              "MNLI":'https://dl.fbaipublicfiles.com/glue/data/MNLI.zip',

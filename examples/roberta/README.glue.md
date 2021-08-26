@@ -2,15 +2,32 @@
 
 ### 1) Download the data from GLUE website (https://gluebenchmark.com/tasks) using following commands:
 download shell 
+
+
+old ~~ wget https://gist.githubusercontent.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e/raw/17b8dd0d724281ed7c3b2aeeda662b92809aadd5/download_glue_data.pyarrow
+~~
+
+
 ```bash 
 cd scripts
 wget https://gist.githubusercontent.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e/raw/1502038877f6a88c225a34450793fbc3ea87eaba/download_glue_data.py```
+
+```
 already in the `scripts/download_glue_data.py`
 sometimes this script is out of date, you should get the newer version of this
+and refresh 
+
+```
+TASK2PATH = {"CoLA":'https://dl.fbaipublicfiles.com/glue/data/CoLA.zip',
+             "SST":'https://dl.fbaipublicfiles.com/glue/data/SST-2.zip',
+             "MRPC": 'https://firebasestorage.googleapis.com/v0/b/mtl-sentence-representations.appspot.com/o/data%2Fmrpc_dev_ids.tsv?alt=media&token=ec5c0836-31d5-48f4-b431-7480817f1adc',
+            
+            ...}
+```
 
 ### change the data path in scripts/download_glue_dataset.sh
-```bash
-# wget https://gist.githubusercontent.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e/raw/17b8dd0d724281ed7c3b2aeeda662b92809aadd5/download_glue_data.py
+
+
 
 # python download_glue_data.py --data_dir glue_data --tasks all
 sh scripts/download_glue_dataset.sh

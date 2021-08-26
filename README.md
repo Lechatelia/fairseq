@@ -1,12 +1,18 @@
 # instructions
 ## install environments
-git checkout main
+~~git checkout main~~
+I have changed the master to the available location
 
-pip install -U omegaconf==2.0.6 hydra-core==1.0.6
+```pip install -U omegaconf==2.0.6 hydra-core==1.0.6```
+
+for other metrics
+
+```pip install scipy sklearn```
 
 ## prepare data
 
 please refer to 
+* [roberta introduction](examples/roberta)
 * [roberta pretrain](examples/roberta/README.pretraining.md)
 * [roberta finetune](examples/roberta/README.glue.md)
 
