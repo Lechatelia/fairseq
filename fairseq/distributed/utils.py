@@ -42,11 +42,35 @@ logger = logging.getLogger(__name__)
 def is_master(cfg: DistributedTrainingConfig):
     return cfg.distributed_rank == 0
 
+def slurm_environ_init():
+    '''
+    please specify the 'MASTER_PORT' in the shell script, default: 29500
+    '''
+    if 'SLURM_PROCID' not in os.environ:
+        return
+    proc_id = int(os.environ['SLURM_PROCID'])
+    if proc_id==0:
+        print('Init dist using slurm!')
+        print("Job Id is {} ".format(os.environ["SLURM_JOBID"]))
+    ntasks = int(os.environ['SLURM_NTASKS'])
+    node_list = os.environ['SLURM_NODELIST']
+    num_gpus = torch.cuda.device_count()
+    addr = subprocess.getoutput(
+            'scontrol show hostname {} | head -n1'.format(node_list))
+    jobid = os.environ["SLURM_JOBID"]
+    os.environ['MASTER_PORT'] = os.environ.get('MASTER_PORT', '29500')
+    os.environ['MASTER_ADDR'] = addr
+    os.environ['WORLD_SIZE'] = str(ntasks)
+    os.environ['RANK'] = str(proc_id)
+    os.environ['LOCAL_RANK'] = str(proc_id % num_gpus)
+    os.environ['LOCAL_SIZE'] = str(num_gpus)
 
 def infer_init_method(cfg: DistributedTrainingConfig, force_distributed=False):
     if cfg.distributed_init_method is not None or cfg.tpu:
         return
-
+    
+    slurm_environ_init()
+    
     num_pipelines_per_node = None
     if cfg.pipeline_model_parallel:
         num_pipeline_devices, num_pipelines_per_node = _pipeline_parallel_pre_init(cfg)

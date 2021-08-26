@@ -47,6 +47,7 @@ do
         break;
     fi
 done
+export MASTER_PORT=${PORT}
 
 spring.submit arun --mpi=None  --job-name=${JOB_NAME} -n$GPUS --gpu   \
 --gres=gpu:${GPUS_PER_NODE}  --ntasks-per-node=${GPUS_PER_NODE} \
@@ -59,5 +60,5 @@ spring.submit arun --mpi=None  --job-name=${JOB_NAME} -n$GPUS --gpu   \
     --dropout 0.1 --attention-dropout 0.1 --weight-decay 0.01 \
     --batch-size $MAX_SENTENCES --update-freq $UPDATE_FREQ \
     --max-update $TOTAL_UPDATES --log-format simple --log-interval 1 --save-dir $WORK_DIR/checkpoints \
-    --distributed-port ${PORT} $PY_ARGS \
+     $PY_ARGS \
     2>&1 | tee -a $WORK_DIR/exp_$now.txt "
