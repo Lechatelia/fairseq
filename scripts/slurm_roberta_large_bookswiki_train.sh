@@ -1,16 +1,12 @@
 #!/bin/bash
 
-if [[ $# -ge 1 ]]; then
-  JOB_NAME=${1}
-else
-  JOB_NAME=debug
-fi
 
-if [ $# -ge 2 ]; then
-  GPUS=$2
-else
-  GPUS=16
-fi
+JOB_NAME=${1:-debug}
+
+GPUS=${2:-8}
+SRUN=${3:-"srun"}
+PY_ARGS=${@:4}
+
 
 GPUS_PER_NODE=${GPUS:-8}
 if [ $GPUS_PER_NODE -ge 8 ]; then
@@ -19,7 +15,6 @@ fi
 
 CPUS_PER_TASK=${CPUS_PER_TASK:-4}
 SRUN_ARGS=${SRUN_ARGS:-""}
-PY_ARGS=${@:4}
 
 filename=$(basename "$0")
 echo "$filename"
@@ -50,7 +45,7 @@ done
 export MASTER_PORT=${PORT}
 
 a=$(echo $HOSTNAME | cut  -c12-16)
-if [ $a == '198-6' ]; then
+if [ $a == '198-6' -o "${SRUN}" == "spring" ]; then
 spring.submit arun --mpi=None  --job-name=${JOB_NAME} -n$GPUS --gpu   \
 --gres=gpu:${GPUS_PER_NODE}  --ntasks-per-node=${GPUS_PER_NODE} \
 --cpus-per-task $CPUS_PER_TASK \
@@ -62,7 +57,7 @@ spring.submit arun --mpi=None  --job-name=${JOB_NAME} -n$GPUS --gpu   \
     --dropout 0.1 --attention-dropout 0.1 --weight-decay 0.01 \
     --batch-size $MAX_SENTENCES --update-freq $UPDATE_FREQ \
     --max-update $TOTAL_UPDATES --log-format simple --log-interval 1 --save-dir $WORK_DIR/checkpoints \
-     $PY_ARGS \
+    --distributed-port ${PORT} --distributed-world-size $GPUS  $PY_ARGS \
     2>&1 | tee -a $WORK_DIR/exp_$now.txt "
 
 elif [ $a == '198-8' ]; then
@@ -73,12 +68,12 @@ srun --partition=vc_research_2 --mpi=pmi2 \
   python ./train.py --fp16 $DATA_DIR \
     --task masked_lm --criterion masked_lm \
     --arch roberta_large --sample-break-mode complete --tokens-per-sample $TOKENS_PER_SAMPLE \
-    --optimizer adam --adam-betas "(0.9,0.98)" --adam-eps 1e-6 --clip-norm 0.0 \
+    --optimizer adam --adam-betas '(0.9,0.98)' --adam-eps 1e-6 --clip-norm 0.0 \
     --lr-scheduler polynomial_decay --lr $PEAK_LR --warmup-updates $WARMUP_UPDATES --total-num-update $TOTAL_UPDATES \
     --dropout 0.1 --attention-dropout 0.1 --weight-decay 0.01 \
     --batch-size $MAX_SENTENCES --update-freq $UPDATE_FREQ \
     --max-update $TOTAL_UPDATES --log-format simple --log-interval 1 --save-dir $WORK_DIR/checkpoints \
-     $PY_ARGS \
+     --distributed-port ${PORT} --distributed-world-size $GPUS $PY_ARGS \
     2>&1 | tee -a $WORK_DIR/exp_$now.txt 
 else
   echo only SH1986 and SH1988 supported now 
