@@ -50,7 +50,7 @@ do
         break;
     fi
 done
-export MASTER_PORT=${PORT}
+# export MASTER_PORT=${PORT}
 
 a=$(echo $HOSTNAME | cut  -c12-16)
 if [ $a == '198-6' -o "${SRUN}" == "spring" ]; then

@@ -74,10 +74,6 @@ for task_index in "${!TASKS[@]}"
     done
     # export MASTER_PORT=${PORT}
 
-<<<<<<< HEAD
-=======
-
->>>>>>> e9c1a7a0b7c71f593d86a6dca3c7851f9b0d9c37
 
 {
 a=$(echo $HOSTNAME | cut  -c12-16)
