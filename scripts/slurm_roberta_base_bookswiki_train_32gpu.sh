@@ -3,7 +3,7 @@
 
 JOB_NAME=${1:-debug}
 
-GPUS=${2:-8}
+GPUS=${2:-32}
 SRUN=${3:-"srun"}
 PY_ARGS=${@:4}
 
@@ -39,7 +39,7 @@ PEAK_LR=0.0005          # Peak learning rate, adjust as needed
 TOKENS_PER_SAMPLE=512   # Max sequence length
 MAX_POSITIONS=512       # Num. positional embeddings (usually same as above)
 MAX_SENTENCES=16        # Number of sequences per batch (batch size)
-UPDATE_FREQ=16          # Increase the batch size 16x
+UPDATE_FREQ=4          # Increase the batch size 16x
 
 while true # find unused tcp port
 do

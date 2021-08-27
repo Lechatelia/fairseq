@@ -35,8 +35,15 @@ WARMUP_UPDATES=('7432'	'1986'	'28318'	'122'	'1256'	'137'	'320'	'214')
 
 MAX_SENTENCES=16        # Batch size.
 ROBERTA_PATH=pretrained_checkpoints/roberta.large/model.pt
-DATA_DIR=/mnt/lustre/share_data/zhujinguo/data/bert_pretrain_data/glue_data
 
+a=$(echo $HOSTNAME | cut  -c12-16)
+if [ $a == '198-6' ]; then
+DATA_DIR=/mnt/lustre/share_data/zhujinguo/data/bert_pretrain_data/glue_data
+elif [ $a == '198-8' ]; then
+DATA_DIR=/mnt/cache/share_data/zhujinguo/data/bert_pretrain_data/glue_data
+else
+  echo only SH1986 and SH1988 supported now 
+fi
 
 for task_index in "${!TASKS[@]}"
  do 
@@ -67,8 +74,8 @@ for task_index in "${!TASKS[@]}"
     done
     # export MASTER_PORT=${PORT}
 
-set -x 
 
+{
 a=$(echo $HOSTNAME | cut  -c12-16)
 if [ $a == '198-6' -o "${SRUN}" == "spring" ]; then
     spring.submit arun --mpi=None  --job-name=${TASK}-${JOB_NAME} -n$GPUS --gpu   \
@@ -127,7 +134,7 @@ elif [ $a == '198-8' ]; then
 else
   echo only SH1986 and SH1988 supported now 
 fi
-
+}&
 
 sleep 10
     

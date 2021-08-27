@@ -22,8 +22,15 @@ WORK_DIR=${filename//.sh//$JOB_NAME}
 WORK_DIR=workdirs/$WORK_DIR
 mkdir  -p $WORK_DIR
 
-DATA_DIR=/mnt/lustre/share_data/zhujinguo/data/bert_pretrain_data/wikitext/wikitext-103-raw/data-bin/wikitext-103
 
+a=$(echo $HOSTNAME | cut  -c12-16)
+if [ $a == '198-6' ]; then
+DATA_DIR=/mnt/lustre/share_data/zhujinguo/data/bert_pretrain_data/wikitext/wikitext-103-raw/data-bin/wikitext-103
+elif [ $a == '198-8' ]; then
+DATA_DIR=/mnt/cache/share_data/zhujinguo/data/bert_pretrain_data/wikitext/wikitext-103-raw/data-bin/wikitext-103
+else
+  echo only SH1986 and SH1988 supported now 
+fi
 now=$(date +"%Y%m%d_%H%M%S")
 
 TOTAL_UPDATES=125000    # Total number of training steps
