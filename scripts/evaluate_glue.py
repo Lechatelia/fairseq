@@ -120,14 +120,18 @@ def eval_task(task_name, args):
             
             else:
                 raise NotImplementedError
-            
-            prediction = roberta.predict('sentence_classification_head', tokens).argmax().item()
-            prediction_label = label_fn(prediction)
-            ncorrect += int(prediction_label == target)
-            preds.append(prediction)
-            labels.append(roberta.task.label_dictionary.index(target)-roberta.task.label_dictionary.nspecial)
-            nsamples += 1     
-        print('| Accuracy: ', float(ncorrect)/float(nsamples))
+            if task_name != 'STS-B':
+                prediction = roberta.predict('sentence_classification_head', tokens).argmax().item()
+                prediction_label = label_fn(prediction)
+                ncorrect += int(prediction_label == target)
+                preds.append(prediction)
+                labels.append(roberta.task.label_dictionary.index(target)-roberta.task.label_dictionary.nspecial)
+            else:
+                # regression task
+                preds.append(roberta.predict('sentence_classification_head', tokens,return_logits=True).item())
+                labels.append(float(target)/5.0)
+            # nsamples += 1     
+        # print('| Accuracy: ', float(ncorrect)/float(nsamples))
         preds = np.array(preds)
         labels = np.array(labels)
         
