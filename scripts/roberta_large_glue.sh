@@ -27,7 +27,7 @@ MAX_SENTENCES=16        # Batch size.
 ROBERTA_PATH=pretrained_checkpoints/roberta.large/model.pt
 DATA_DIR=/nfs/zhujinguo/datasets/data/bert_pretrain_data/glue_data
 
-set -x
+
 
 for task_index in "${!TASKS[@]}"
  do 
