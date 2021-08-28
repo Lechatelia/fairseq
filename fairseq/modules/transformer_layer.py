@@ -414,3 +414,167 @@ class TransformerDecoderLayer(nn.Module):
 
     def make_generation_fast_(self, need_attn: bool = False, **kwargs):
         self.need_attn = need_attn
+
+
+class CrossAttentionLayer(nn.Module):
+    """cross attention layer block without selfattetnion compared to decoder layer.
+
+    Args:
+        args (argparse.Namespace): parsed command-line arguments
+
+    """
+
+    def __init__(
+        self, args):
+        super().__init__()
+        self.embed_dim = args.decoder_embed_dim
+        self.dropout_module = FairseqDropout(
+            args.dropout, module_name=self.__class__.__name__
+        )
+        self.quant_noise = getattr(args, "quant_noise_pq", 0)
+        self.quant_noise_block_size = getattr(args, "quant_noise_pq_block_size", 8)
+
+        self.activation_fn = utils.get_activation_fn(
+            activation=str(args.activation_fn)
+            if getattr(args, "activation_fn", None) is not None
+            else "relu"
+        )
+        activation_dropout_p = getattr(args, "activation_dropout", 0) or 0
+        if activation_dropout_p == 0:
+            # for backwards compatibility with models that use args.relu_dropout
+            activation_dropout_p = getattr(args, "relu_dropout", 0) or 0
+        self.activation_dropout_module = FairseqDropout(
+            float(activation_dropout_p), module_name=self.__class__.__name__
+        )
+        self.normalize_before = args.decoder_normalize_before
+
+        # use layerNorm rather than FusedLayerNorm for exporting.
+        # char_inputs can be used to determint this.
+        # TODO  remove this once we update apex with the fix
+        export = getattr(args, "char_inputs", False)
+        self.self_attn_layer_norm = LayerNorm(self.embed_dim, export=export)
+
+
+        self.encoder_attn = self.build_encoder_attention(self.embed_dim, args)
+        self.encoder_attn_layer_norm = LayerNorm(self.embed_dim, export=export)
+
+        self.fc1 = self.build_fc1(
+            self.embed_dim,
+            args.decoder_ffn_embed_dim,
+            self.quant_noise,
+            self.quant_noise_block_size,
+        )
+        self.fc2 = self.build_fc2(
+            args.decoder_ffn_embed_dim,
+            self.embed_dim,
+            self.quant_noise,
+            self.quant_noise_block_size,
+        )
+
+        self.final_layer_norm = LayerNorm(self.embed_dim, export=export)
+        self.need_attn = True
+
+        self.onnx_trace = False
+        
+        self._use_query_residual = args.use_query_residual
+
+    def build_fc1(self, input_dim, output_dim, q_noise, qn_block_size):
+        return quant_noise(nn.Linear(input_dim, output_dim), q_noise, qn_block_size)
+
+    def build_fc2(self, input_dim, output_dim, q_noise, qn_block_size):
+        return quant_noise(nn.Linear(input_dim, output_dim), q_noise, qn_block_size)
+
+
+    def build_encoder_attention(self, embed_dim, args):
+        return MultiheadAttention(
+            embed_dim,
+            args.decoder_attention_heads,
+            kdim=getattr(args, "encoder_embed_dim", None),
+            vdim=getattr(args, "encoder_embed_dim", None),
+            dropout=args.attention_dropout,
+            encoder_decoder_attention=True,
+            q_noise=self.quant_noise,
+            qn_block_size=self.quant_noise_block_size,
+        )
+
+    def prepare_for_onnx_export_(self):
+        self.onnx_trace = True
+
+    def residual_connection(self, x, residual):
+        return residual + x
+
+    def forward(
+        self,
+        x,
+        encoder_out: Optional[torch.Tensor] = None,
+        encoder_padding_mask: Optional[torch.Tensor] = None,
+        incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]] = None,
+        prev_attn_state: Optional[List[torch.Tensor]] = None,
+        need_attn: bool = False,
+        need_head_weights: bool = False,
+    ):
+        """
+        Args:
+            x (Tensor): input to the layer of shape `(seq_len, batch, embed_dim)`
+            encoder_padding_mask (ByteTensor, optional): binary
+                ByteTensor of shape `(batch, src_len)` where padding
+                elements are indicated by ``1``.
+            need_attn (bool, optional): return attention weights
+            need_head_weights (bool, optional): return attention weights
+                for each head (default: return average over heads).
+
+        Returns:
+            encoded output of shape `(seq_len, batch, embed_dim)`
+        """
+        if need_head_weights:
+            need_attn = True
+
+
+
+        residual = x
+        if self.normalize_before:
+            x = self.encoder_attn_layer_norm(x)
+        if prev_attn_state is not None:
+            prev_key, prev_value = prev_attn_state[:2]
+            saved_state: Dict[str, Optional[Tensor]] = {
+                "prev_key": prev_key,
+                "prev_value": prev_value,
+            }
+            if len(prev_attn_state) >= 3:
+                saved_state["prev_key_padding_mask"] = prev_attn_state[2]
+            assert incremental_state is not None
+            self.encoder_attn._set_input_buffer(incremental_state, saved_state)
+
+        x, attn = self.encoder_attn(
+            query=x,
+            key=encoder_out,
+            value=encoder_out,
+            key_padding_mask=encoder_padding_mask,
+            incremental_state=incremental_state,
+            static_kv=True,
+            need_weights=need_attn or (not self.training and self.need_attn),
+            need_head_weights=need_head_weights,
+        )
+        x = self.dropout_module(x)
+        
+        # Optionally include a residual to the query.
+        # Consider omitting the residual if the semantics of query and output
+        # are different, e.g. if queries are positions and outputs are pixels.
+        if self._use_query_residual:
+            x = self.residual_connection(x, residual)
+            
+        if not self.normalize_before:
+            x = self.encoder_attn_layer_norm(x)
+
+        residual = x
+        if self.normalize_before:
+            x = self.final_layer_norm(x)
+
+        x = self.activation_fn(self.fc1(x))
+        x = self.activation_dropout_module(x)
+        x = self.fc2(x)
+        x = self.dropout_module(x)
+        x = self.residual_connection(x, residual)
+        if not self.normalize_before:
+            x = self.final_layer_norm(x)
+        return x, attn, None
