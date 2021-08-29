@@ -195,9 +195,12 @@ pip install --editable ./
 ``` bash
 git clone https://github.com/NVIDIA/apex
 cd apex
-pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" \
-  --global-option="--deprecated_fused_adam" --global-option="--xentropy" \
-  --global-option="--fast_multihead_attn" ./
+python setup.py install --user
+
+# pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" \
+#   --global-option="--deprecated_fused_adam" --global-option="--xentropy" \
+#   --global-option="--fast_multihead_attn" ./ 
+
 ```
 
 * **For large datasets** install [PyArrow](https://arrow.apache.org/docs/python/install.html#using-pip): `pip install pyarrow`
