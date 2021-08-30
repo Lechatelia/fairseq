@@ -113,13 +113,14 @@ class FairseqLAMB(LegacyFairseqOptimizer):
 
     def __init__(self, args, params):
         super().__init__(args)
-        # try:
-        #     from apex.optimizers import FusedLAMB
+        try:
+            from apex.optimizers import FusedLAMB
 
-        #     self._optimizer = FusedLAMB(params, **self.optimizer_config)
-        # except ImportError:
-        #     raise ImportError("Please install apex to use LAMB optimizer")
-        self._optimizer = Lamb(params, **self.optimizer_config)
+            self._optimizer = FusedLAMB(params, **self.optimizer_config)
+        except ImportError:
+            # raise ImportError("Please install apex to use LAMB optimizer")
+            print('use self-implementation of LAMB')
+            self._optimizer = Lamb(params, **self.optimizer_config)
         
     @staticmethod
     def add_args(parser):
