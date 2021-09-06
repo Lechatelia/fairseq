@@ -195,7 +195,7 @@ pip install --editable ./
 ``` bash
 git clone https://github.com/NVIDIA/apex
 cd apex
-python setup.py install --user
+pip install -v --disable-pip-version-check --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./
 
 # pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" \
 #   --global-option="--deprecated_fused_adam" --global-option="--xentropy" \
