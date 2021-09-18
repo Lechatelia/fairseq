@@ -811,6 +811,7 @@ def base_architecture(args):
     args.encoder_attention_heads = getattr(args, "encoder_attention_heads", 8)
     args.latent_attention_heads = getattr(args, "latent_attention_heads", 8)
     args.lm_attention_heads = getattr(args, "lm_attention_heads", 12)
+    args.encoder_embed_dim = getattr(args, "words_embed_dim", 768) # for classifer
 
     args.mapping_residual = getattr(args, 'mapping_residual', True)
     args.lm_attention_residual = getattr(args, 'lm_attention_residual', True)

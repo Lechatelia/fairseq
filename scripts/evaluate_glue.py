@@ -17,6 +17,8 @@ def get_tasks(task_names):
     task_names = task_names.split(',')
     if "all" in task_names:
         tasks = TASKS
+    elif 'two' in task_names:
+        tasks = ['CoLA', 'STS-B']
     else:
         tasks = []
         for task_name in task_names:

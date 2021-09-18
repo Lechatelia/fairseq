@@ -33,13 +33,13 @@ fi
 
 now=$(date +"%Y%m%d_%H%M%S")
 
-TOTAL_UPDATES=500000    # Total number of training steps
+TOTAL_UPDATES=125000    # Total number of training steps
 WARMUP_UPDATES=1000    # Warmup the learning rate over this many updates
-PEAK_LR=0.000625          # Peak learning rate, adjust as needed
+PEAK_LR=0.00125          # Peak learning rate, adjust as needed
 TOKENS_PER_SAMPLE=512   # Max sequence length
 MAX_POSITIONS=512       # Num. positional embeddings (usually same as above)
 MAX_SENTENCES=32        # Number of sequences per batch (batch size)
-UPDATE_FREQ=1          # Increase the batch size 16x
+UPDATE_FREQ=4          # Increase the batch size 16x
 
 while true # find unused tcp port
 do
