@@ -571,6 +571,15 @@ def roberta_large_architecture(args):
     args.encoder_ffn_embed_dim = getattr(args, "encoder_ffn_embed_dim", 4096)
     args.encoder_attention_heads = getattr(args, "encoder_attention_heads", 16)
     base_architecture(args)
+    
+@register_model_architecture("roberta", "roberta_small")
+def roberta_small_architecture(args):
+    args.encoder_layers = getattr(args, "encoder_layers", 6)
+    args.encoder_embed_dim = getattr(args, "encoder_embed_dim", 512)
+    args.encoder_ffn_embed_dim = getattr(args, "encoder_ffn_embed_dim", 2048)
+    args.encoder_attention_heads = getattr(args, "encoder_attention_heads", 8)
+    base_architecture(args)
+
 
 
 @register_model_architecture("roberta", "xlm")
