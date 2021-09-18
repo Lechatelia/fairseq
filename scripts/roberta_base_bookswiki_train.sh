@@ -12,7 +12,7 @@ WORK_DIR=${filename//.sh//$JOB_NAME}
 WORK_DIR=workdirs/$WORK_DIR
 mkdir  -p $WORK_DIR
 
-DATA_DIR=/nfs/zhujinguo/datasets/data/bert_pretrain_data/bookswiki/data-bin/bookswiki-combine
+DATA_DIR=/nfs/zhujinguo/datasets/open_source_dataset/bert_pretrain_data/bookswiki/data-bin/bookswiki-combine
 
 now=$(date +"%Y%m%d_%H%M%S")
 
@@ -22,7 +22,7 @@ PEAK_LR=0.0005          # Peak learning rate, adjust as needed
 TOKENS_PER_SAMPLE=512   # Max sequence length
 MAX_POSITIONS=512       # Num. positional embeddings (usually same as above)
 MAX_SENTENCES=16        # Number of sequences per batch (batch size)
-UPDATE_FREQ=16          # Increase the batch size 16x
+UPDATE_FREQ=1          # Increase the batch size 16x
 
 
 python ./train.py --fp16 $DATA_DIR \
