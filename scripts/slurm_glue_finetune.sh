@@ -119,7 +119,7 @@ elif [ $a == '198-8' ]; then
 {
 srun --partition=vc_research_2 --mpi=pmi2 \
   --job-name=${TASK}-${JOB_NAME} -n$GPUS \
-  --gres=gpu:${GPUS_PER_NODE}  --ntasks-per-node=${GPUS_PER_NODE} \
+  --gres=gpu:${GPUS_PER_NODE}  --ntasks-per-node=${GPUS_PER_NODE} -x SH-IDC1-10-198-8-152 \
   --kill-on-bad-exit=1  --cpus-per-task $CPUS_PER_TASK \
   python ./train.py ${DATA_DIR}/${TASK}-bin/ \
       --restore-file $ROBERTA_PATH \

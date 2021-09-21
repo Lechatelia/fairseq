@@ -15,6 +15,16 @@ please refer to
 * [roberta introduction](examples/roberta)
 * [roberta pretrain](examples/roberta/README.pretraining.md)
 * [roberta finetune](examples/roberta/README.glue.md)
+### fintune 
+
+training
+```
+sh scripts/slurm_glue_finetune.sh roberta_small  workdirs/slurm_roberta_small_bookswiki_train_8gpu_100k/bert_small_100k/checkpoints/checkpoint_last.pt   fintune_small_100k ALL srun
+```
+evaluation
+```
+sh scripts/evaluate_glue.sh two workdirs/slurm_glue_finetune/roberta_small_fintune_small_100k srun
+```
 
 ## wikipedia bookcorpus data pretrain
 cd your data path 

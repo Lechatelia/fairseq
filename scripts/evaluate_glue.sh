@@ -1,11 +1,11 @@
 #!/bin/bash
 
 if [ $# -ge 2 ]; then
-  TASKS=${1} # ALL STS-B CoLA
-  checkpoints=${2} # workdirs/slurm_roberta_large_glue/finetune
+  TASKS=${1} # all STS-B CoLA
+  checkpoints=${2} #workdirs/slurm_glue_finetune/roberta_base_finetune_roberta_base_125k
   SRUN=${3:-'srun'}
 else
-echo sh scripts/evaluate_glue.sh ALL workdirs/slurm_roberta_large_glue/finetune
+echo sh scripts/evaluate_glue.sh ALL workdirs/slurm_glue_finetune/roberta_base_finetune_roberta_base_125k
 fi
 
 now=$(date +"%Y%m%d_%H%M%S")
